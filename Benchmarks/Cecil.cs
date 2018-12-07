@@ -1,12 +1,14 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Order;
 using Java.Interop.Tools.Cecil;
 using Mono.Cecil;
-using System;
 using System.Diagnostics;
 using System.IO;
 
 namespace Benchmarks
 {
+	[Orderer (SummaryOrderPolicy.FastestToSlowest)]
+	[MemoryDiagnoser]
 	public class Cecil
 	{
 		readonly string [] assemblies;
