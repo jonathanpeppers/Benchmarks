@@ -11,15 +11,14 @@ Intel Core i7-7600U CPU 2.80GHz (Kaby Lake), 1 CPU, 4 logical and 2 physical cor
   DefaultJob : .NET Framework 4.7.2 (CLR 4.0.30319.42000), 32bit LegacyJIT-v4.7.3190.0
 
 
-   Method |      Mean |    Error |    StdDev |
---------- |----------:|---------:|----------:|
- Defaults |  74.45 ms | 1.026 ms | 0.8564 ms |
- InMemory | 114.33 ms | 2.251 ms | 2.1054 ms |
+   Method |     Mean |     Error |    StdDev |
+--------- |---------:|----------:|----------:|
+ Defaults | 495.7 ms |  5.646 ms |  5.005 ms |
+ InMemory | 537.9 ms | 10.245 ms | 11.388 ms |
 
 // * Hints *
 Outliers
-  Cecil.Defaults: Default -> 2 outliers were removed
-  Cecil.InMemory: Default -> 1 outlier  was  removed
+  Cecil.Defaults: Default -> 1 outlier  was  removed
 
 // * Legends *
   Mean   : Arithmetic mean of all measurements
@@ -28,5 +27,5 @@ Outliers
   1 ms   : 1 Millisecond (0.001 sec)
 
 // ***** BenchmarkRunner: End *****
-Run time: 00:00:33 (33.18 sec), executed benchmarks: 2
+Run time: 00:00:32 (32.43 sec), executed benchmarks: 2
 ```

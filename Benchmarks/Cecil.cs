@@ -52,6 +52,9 @@ namespace Benchmarks
 					}
 					foreach (var type in mod.Types) {
 						var name = type.Name;
+						foreach (var method in type.Methods) {
+							var mname = method.Name;
+						}
 					}
 				}
 			}
