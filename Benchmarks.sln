@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{22C0A3E8-5493-4282-A216-0FDC2010B2A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Reflection.Metadata.Cecil", "System.Reflection.Metadata.Cecil\System.Reflection.Metadata.Cecil.csproj", "{4D4EDE1E-B32B-4163-A179-AD0DFA253A66}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{22C0A3E8-5493-4282-A216-0FDC2010B2A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22C0A3E8-5493-4282-A216-0FDC2010B2A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22C0A3E8-5493-4282-A216-0FDC2010B2A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D4EDE1E-B32B-4163-A179-AD0DFA253A66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D4EDE1E-B32B-4163-A179-AD0DFA253A66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D4EDE1E-B32B-4163-A179-AD0DFA253A66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D4EDE1E-B32B-4163-A179-AD0DFA253A66}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

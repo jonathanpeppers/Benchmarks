@@ -11,17 +11,16 @@ Intel Core i7-7600U CPU 2.80GHz (Kaby Lake), 1 CPU, 4 logical and 2 physical cor
   DefaultJob : .NET Framework 4.7.2 (CLR 4.0.30319.42000), 32bit LegacyJIT-v4.7.3190.0
 
 
-                                              Method |      Mean |     Error |    StdDev | Gen 0/1k Op | Gen 1/1k Op | Gen 2/1k Op | Allocated Memory/Op |
----------------------------------------------------- |----------:|----------:|----------:|------------:|------------:|------------:|--------------------:|
- 'System.Reflection.Metadata with default settings.' |  50.81 ms |  1.051 ms |  1.366 ms |   8363.6364 |           - |           - |            16.91 MB |
-                 'Mono.Cecil with default settings.' | 489.72 ms |  8.764 ms |  7.318 ms |  16000.0000 |  11000.0000 |   3000.0000 |           103.41 MB |
-     'Mono.Cecil with ReadingMode.Deferred setting.' | 502.03 ms | 10.815 ms | 10.116 ms |  16000.0000 |  11000.0000 |   3000.0000 |           103.41 MB |
-            'Mono.Cecil with InMemory=True setting.' | 538.11 ms | 10.681 ms | 11.429 ms |  18000.0000 |  11000.0000 |   3000.0000 |           157.73 MB |
+                                               Method |      Mean |    Error |   StdDev | Gen 0/1k Op | Gen 1/1k Op | Gen 2/1k Op | Allocated Memory/Op |
+----------------------------------------------------- |----------:|---------:|---------:|------------:|------------:|------------:|--------------------:|
+  'System.Reflection.Metadata with default settings.' |  57.45 ms | 1.133 ms | 2.072 ms |  10888.8889 |           - |           - |            21.84 MB |
+ 'System.Reflection.Metadata with Mono.Cecil compat.' |  96.64 ms | 1.896 ms | 2.183 ms |   6000.0000 |   2833.3333 |   1000.0000 |            29.53 MB |
+                  'Mono.Cecil with default settings.' | 507.19 ms | 9.854 ms | 8.229 ms |  16000.0000 |  11000.0000 |   3000.0000 |           103.41 MB |
 
 // * Hints *
 Outliers
-  Cecil.'System.Reflection.Metadata with default settings.': Default -> 3 outliers were removed
-  Cecil.'Mono.Cecil with default settings.': Default                 -> 2 outliers were removed
+  Cecil.'System.Reflection.Metadata with Mono.Cecil compat.': Default -> 1 outlier  was  removed
+  Cecil.'Mono.Cecil with default settings.': Default                  -> 2 outliers were removed, 4 outliers were detected
 
 // * Legends *
   Mean                : Arithmetic mean of all measurements
@@ -34,5 +33,5 @@ Outliers
   1 ms                : 1 Millisecond (0.001 sec)
 
 // ***** BenchmarkRunner: End *****
-Run time: 00:01:12 (72.56 sec), executed benchmarks: 4
+Run time: 00:01:03 (63.18 sec), executed benchmarks: 3
 ```
