@@ -4,6 +4,8 @@ using Java.Interop.Tools.Cecil;
 using Mono.Cecil;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 
 namespace Benchmarks
 {
@@ -20,19 +22,30 @@ namespace Benchmarks
 			assemblies = Directory.GetFiles (assembliesDir, "*.dll");
 		}
 
-		[Benchmark]
-		public void Defaults ()
+		[Benchmark (Description = "Mono.Cecil with default settings.")]
+		public void MonoCecil ()
 		{
 			using (var resolver = new DirectoryAssemblyResolver (Log, loadDebugSymbols: false)) {
 				IterateAssemblies (resolver);
 			}
 		}
 
-		[Benchmark]
-		public void InMemory ()
+		[Benchmark (Description = "Mono.Cecil with InMemory=True setting.")]
+		public void MonoCecil_InMemory ()
 		{
 			var rp = new ReaderParameters {
 				InMemory = true
+			};
+			using (var resolver = new DirectoryAssemblyResolver (Log, loadDebugSymbols: false, loadReaderParameters: rp)) {
+				IterateAssemblies (resolver);
+			}
+		}
+
+		[Benchmark (Description = "Mono.Cecil with ReadingMode.Deferred setting.")]
+		public void MonoCecil_Deferred ()
+		{
+			var rp = new ReaderParameters {
+				ReadingMode = ReadingMode.Deferred,
 			};
 			using (var resolver = new DirectoryAssemblyResolver (Log, loadDebugSymbols: false, loadReaderParameters: rp)) {
 				IterateAssemblies (resolver);
@@ -56,6 +69,43 @@ namespace Benchmarks
 						var name = type.Name;
 						foreach (var method in type.Methods) {
 							var mname = method.Name;
+						}
+					}
+				}
+			}
+		}
+
+		[Benchmark (Description = "System.Reflection.Metadata with default settings.")]
+		public void SystemReflectionMetadata ()
+		{
+			foreach (var assemblyFile in assemblies) {
+				using (var stream = File.OpenRead (assemblyFile))
+				using (var pe = new PEReader (stream)) {
+					var reader = pe.GetMetadataReader ();
+					var assembly = reader.GetAssemblyDefinition ();
+					foreach (var r in reader.ManifestResources) {
+						var resource = reader.GetManifestResource (r);
+						var name = reader.GetString (resource.Name);
+					}
+					foreach (var a in reader.CustomAttributes) {
+						var attr = reader.GetCustomAttribute (a);
+						if (attr.Constructor.Kind == HandleKind.MemberReference) {
+							var ctor = reader.GetMemberReference ((MemberReferenceHandle)attr.Constructor);
+							var attrType = reader.GetTypeReference ((TypeReferenceHandle)ctor.Parent);
+							var name = reader.GetString (attrType.Name);
+						} 
+						//TODO: don't know how to get string in this case
+						//else if (attr.Constructor.Kind == HandleKind.MethodDefinition) {
+						//	var ctor = reader.GetMethodDefinition ((MethodDefinitionHandle)attr.Constructor);
+						//	var name = reader.GetString (ctor.Name);
+						//}
+					}
+					foreach (var t in reader.TypeDefinitions) {
+						var type = reader.GetTypeDefinition (t);
+						var name = reader.GetString (type.Name);
+						foreach (var m in type.GetMethods ()) {
+							var method = reader.GetMethodDefinition (m);
+							var mname = reader.GetString (method.Name);
 						}
 					}
 				}

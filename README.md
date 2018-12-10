@@ -1,6 +1,6 @@
 # Benchmarks
 
-Initial benchmarks for Mono.Cecil:
+Initial benchmarks for Mono.Cecil vs System.Reflection.Metadata:
 
 ```
 // * Summary *
@@ -11,14 +11,17 @@ Intel Core i7-7600U CPU 2.80GHz (Kaby Lake), 1 CPU, 4 logical and 2 physical cor
   DefaultJob : .NET Framework 4.7.2 (CLR 4.0.30319.42000), 32bit LegacyJIT-v4.7.3190.0
 
 
-   Method |     Mean |     Error |    StdDev | Gen 0/1k Op | Gen 1/1k Op | Gen 2/1k Op | Allocated Memory/Op |
---------- |---------:|----------:|----------:|------------:|------------:|------------:|--------------------:|
- Defaults | 518.8 ms | 10.306 ms | 15.425 ms |  16000.0000 |  11000.0000 |   3000.0000 |           103.41 MB |
- InMemory | 541.5 ms |  7.212 ms |  6.746 ms |  16000.0000 |  11000.0000 |   3000.0000 |           157.74 MB |
+                                              Method |      Mean |     Error |    StdDev | Gen 0/1k Op | Gen 1/1k Op | Gen 2/1k Op | Allocated Memory/Op |
+---------------------------------------------------- |----------:|----------:|----------:|------------:|------------:|------------:|--------------------:|
+ 'System.Reflection.Metadata with default settings.' |  50.81 ms |  1.051 ms |  1.366 ms |   8363.6364 |           - |           - |            16.91 MB |
+                 'Mono.Cecil with default settings.' | 489.72 ms |  8.764 ms |  7.318 ms |  16000.0000 |  11000.0000 |   3000.0000 |           103.41 MB |
+     'Mono.Cecil with ReadingMode.Deferred setting.' | 502.03 ms | 10.815 ms | 10.116 ms |  16000.0000 |  11000.0000 |   3000.0000 |           103.41 MB |
+            'Mono.Cecil with InMemory=True setting.' | 538.11 ms | 10.681 ms | 11.429 ms |  18000.0000 |  11000.0000 |   3000.0000 |           157.73 MB |
 
 // * Hints *
 Outliers
-  Cecil.Defaults: Default -> 4 outliers were removed
+  Cecil.'System.Reflection.Metadata with default settings.': Default -> 3 outliers were removed
+  Cecil.'Mono.Cecil with default settings.': Default                 -> 2 outliers were removed
 
 // * Legends *
   Mean                : Arithmetic mean of all measurements
@@ -31,5 +34,5 @@ Outliers
   1 ms                : 1 Millisecond (0.001 sec)
 
 // ***** BenchmarkRunner: End *****
-Run time: 00:00:39 (39.12 sec), executed benchmarks: 2
+Run time: 00:01:12 (72.56 sec), executed benchmarks: 4
 ```
