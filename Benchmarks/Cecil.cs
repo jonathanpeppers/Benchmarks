@@ -87,18 +87,17 @@ namespace Benchmarks
 						var resource = reader.GetManifestResource (r);
 						var name = reader.GetString (resource.Name);
 					}
-					foreach (var a in reader.CustomAttributes) {
+					foreach (var a in assembly.GetCustomAttributes ()) {
 						var attr = reader.GetCustomAttribute (a);
 						if (attr.Constructor.Kind == HandleKind.MemberReference) {
 							var ctor = reader.GetMemberReference ((MemberReferenceHandle)attr.Constructor);
 							var attrType = reader.GetTypeReference ((TypeReferenceHandle)ctor.Parent);
 							var name = reader.GetString (attrType.Name);
-						} 
-						//TODO: don't know how to get string in this case
-						//else if (attr.Constructor.Kind == HandleKind.MethodDefinition) {
-						//	var ctor = reader.GetMethodDefinition ((MethodDefinitionHandle)attr.Constructor);
-						//	var name = reader.GetString (ctor.Name);
-						//}
+						} else if (attr.Constructor.Kind == HandleKind.MethodDefinition) {
+							var ctor = reader.GetMethodDefinition ((MethodDefinitionHandle)attr.Constructor);
+							var attrType = reader.GetTypeDefinition (ctor.GetDeclaringType ());
+							var name = reader.GetString (attrType.Name);
+						}
 					}
 					foreach (var t in reader.TypeDefinitions) {
 						var type = reader.GetTypeDefinition (t);
