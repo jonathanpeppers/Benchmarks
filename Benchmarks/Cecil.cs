@@ -22,62 +22,30 @@ namespace Benchmarks
 			assemblies = Directory.GetFiles (assembliesDir, "*.dll");
 		}
 
-		[Benchmark (Description = "Mono.Cecil with default settings.")]
+		[Benchmark (Description = "Mono.Cecil")]
 		public void MonoCecil ()
 		{
 			using (var resolver = new DirectoryAssemblyResolver (Log, loadDebugSymbols: false)) {
-				IterateAssemblies (resolver);
-			}
-		}
-
-		[Benchmark (Description = "Mono.Cecil with InMemory=True setting.")]
-		public void MonoCecil_InMemory ()
-		{
-			var rp = new ReaderParameters {
-				InMemory = true
-			};
-			using (var resolver = new DirectoryAssemblyResolver (Log, loadDebugSymbols: false, loadReaderParameters: rp)) {
-				IterateAssemblies (resolver);
-			}
-		}
-
-		[Benchmark (Description = "Mono.Cecil with ReadingMode.Deferred setting.")]
-		public void MonoCecil_Deferred ()
-		{
-			var rp = new ReaderParameters {
-				ReadingMode = ReadingMode.Deferred,
-			};
-			using (var resolver = new DirectoryAssemblyResolver (Log, loadDebugSymbols: false, loadReaderParameters: rp)) {
-				IterateAssemblies (resolver);
-			}
-		}
-
-		void Log (TraceLevel level, string message) { }
-
-		void IterateAssemblies (DirectoryAssemblyResolver resolver)
-		{
-			foreach (var assemblyFile in assemblies) {
-				var assembly = resolver.Load (assemblyFile);
-				foreach (var mod in assembly.Modules) {
-					foreach (var resource in mod.Resources) {
-						var name = resource.Name;
-					}
-					foreach (var attr in mod.CustomAttributes) {
-						var name = attr.AttributeType.Name;
-					}
-					foreach (var type in mod.Types) {
-						var name = type.Name;
-						foreach (var method in type.Methods) {
-							var mname = method.Name;
+				foreach (var assemblyFile in assemblies) {
+					var assembly = resolver.Load (assemblyFile);
+					foreach (var mod in assembly.Modules) {
+						foreach (var attr in mod.CustomAttributes) {
+							var name = attr.AttributeType.Name;
+							foreach (var arg in attr.ConstructorArguments) {
+								var value = arg.Value.ToString ();
+							}
 						}
 					}
 				}
 			}
 		}
 
-		[Benchmark (Description = "System.Reflection.Metadata with default settings.")]
+		void Log (TraceLevel level, string message) { }
+
+		[Benchmark (Description = "System.Reflection.Metadata")]
 		public void SystemReflectionMetadata ()
 		{
+			var provider = new CustomAttributeProvider ();
 			foreach (var assemblyFile in assemblies) {
 				using (var stream = File.OpenRead (assemblyFile))
 				using (var pe = new PEReader (stream)) {
@@ -89,25 +57,75 @@ namespace Benchmarks
 					}
 					foreach (var a in assembly.GetCustomAttributes ()) {
 						var attr = reader.GetCustomAttribute (a);
+						string name = null;
 						if (attr.Constructor.Kind == HandleKind.MemberReference) {
 							var ctor = reader.GetMemberReference ((MemberReferenceHandle)attr.Constructor);
 							var attrType = reader.GetTypeReference ((TypeReferenceHandle)ctor.Parent);
-							var name = reader.GetString (attrType.Name);
+							name = reader.GetString (attrType.Name);
+
+							var decoded = attr.DecodeValue (provider);
+							foreach (var arg in decoded.FixedArguments) {
+								var value = arg.Value.ToString ();
+							}
 						} else if (attr.Constructor.Kind == HandleKind.MethodDefinition) {
 							var ctor = reader.GetMethodDefinition ((MethodDefinitionHandle)attr.Constructor);
 							var attrType = reader.GetTypeDefinition (ctor.GetDeclaringType ());
-							var name = reader.GetString (attrType.Name);
+							name = reader.GetString (attrType.Name);
+
+							var decoded = attr.DecodeValue (provider);
+							foreach (var arg in decoded.FixedArguments) {
+								var value = arg.Value.ToString ();
+							}
 						}
-					}
-					foreach (var t in reader.TypeDefinitions) {
-						var type = reader.GetTypeDefinition (t);
-						var name = reader.GetString (type.Name);
-						foreach (var m in type.GetMethods ()) {
-							var method = reader.GetMethodDefinition (m);
-							var mname = reader.GetString (method.Name);
-						}
+
+						//var blob = reader.GetBlobReader (attr.Value);
+
+						
 					}
 				}
+			}
+		}
+
+		class CustomAttributeProvider : ICustomAttributeTypeProvider<string>
+		{
+			public string GetPrimitiveType (PrimitiveTypeCode typeCode)
+			{
+				return null;
+			}
+
+			public string GetSystemType ()
+			{
+				return null;
+			}
+
+			public string GetSZArrayType (string elementType)
+			{
+				return null;
+			}
+
+			public string GetTypeFromDefinition (MetadataReader reader, TypeDefinitionHandle handle, byte rawTypeKind)
+			{
+				return null;
+			}
+
+			public string GetTypeFromReference (MetadataReader reader, TypeReferenceHandle handle, byte rawTypeKind)
+			{
+				return null;
+			}
+
+			public string GetTypeFromSerializedName (string name)
+			{
+				return null;
+			}
+
+			public PrimitiveTypeCode GetUnderlyingEnumType (string type)
+			{
+				return default (PrimitiveTypeCode);
+			}
+
+			public bool IsSystemType (string type)
+			{
+				return false;
 			}
 		}
 	}
