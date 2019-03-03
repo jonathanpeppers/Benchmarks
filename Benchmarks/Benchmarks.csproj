@@ -60,7 +60,6 @@
       <Link>Java.Interop\XamarinAndroidException.cs</Link>
     </Compile>
     <Compile Include="Cecil.cs" />
-    <Compile Include="FileIO.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
