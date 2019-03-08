@@ -14,12 +14,13 @@ namespace Benchmarks
 	[MemoryDiagnoser]
 	public class Cecil
 	{
+		readonly string assembliesDir;
 		readonly string [] assemblies;
 
 		public Cecil ()
 		{
 			var bin = Path.GetDirectoryName (GetType ().Assembly.Location);
-			var assembliesDir = Path.Combine (bin, "..", "..", "Assemblies");
+			assembliesDir = Path.GetFullPath (Path.Combine (bin, "..", "..", "Assemblies"));
 			assemblies = Directory.GetFiles (assembliesDir, "*.dll");
 		}
 
@@ -44,58 +45,58 @@ namespace Benchmarks
 
 		void Log (TraceLevel level, string message) { }
 
-		[Benchmark (Description = "System.Reflection.Metadata")]
+		//[Benchmark (Description = "System.Reflection.Metadata")]
 		public void SystemReflectionMetadata ()
 		{
-			foreach (var assemblyFile in assemblies) {
-				using (var stream = File.OpenRead (assemblyFile))
-				using (var pe = new PEReader (stream)) {
-					var reader = pe.GetMetadataReader ();
-					var assembly = reader.GetAssemblyDefinition ();
+			using (var resolver = new AssemblyResolver ()) {
+				resolver.AddSearchDirectory (assembliesDir);
+
+				foreach (var assemblyFile in assemblies) {
+					var reader = resolver.GetAssemblyReader (Path.GetFileName (assemblyFile));
 					foreach (var t in reader.TypeDefinitions) {
 						var type = reader.GetTypeDefinition (t);
 						var name = reader.GetString (type.Name);
 						if (name == "<Module>")
 							continue;
 
-						System.Reflection.Metadata.TypeDefinition? baseType = type;
-						while ((baseType = GetBaseType (type, reader, assemblyFile)) != null) {
-							name = reader.GetString (baseType.Value.Name);
+						var resolved = new ResolvedTypeDefinition {
+							Type = type,
+							Reader = reader,
+						};
+						while ((resolved = GetBaseType (resolved.Type, resolver, resolved.Reader)) != null) {
+							name = resolved.Reader.GetString (resolved.Type.Name);
 						}
 					}
 				}
 			}
 		}
 
-		System.Reflection.Metadata.TypeDefinition? GetBaseType (System.Reflection.Metadata.TypeDefinition type, MetadataReader reader, string assemblyFile)
+		ResolvedTypeDefinition GetBaseType (System.Reflection.Metadata.TypeDefinition type, AssemblyResolver resolver, MetadataReader reader)
 		{
 			var baseType = type.BaseType;
-			if (baseType.Kind == HandleKind.TypeDefinition) {
-				return reader.GetTypeDefinition ((TypeDefinitionHandle)baseType);
+			if (baseType.IsNil) {
+				return null;
+			} if (baseType.Kind == HandleKind.TypeDefinition) {
+				return new ResolvedTypeDefinition {
+					Type = reader.GetTypeDefinition ((TypeDefinitionHandle)baseType),
+					Reader = reader,
+				};
 			} else if (baseType.Kind == HandleKind.TypeReference) {
-				var typeRef = reader.GetTypeReference ((TypeReferenceHandle)baseType);
-				var assembly = reader.GetAssemblyReference ((AssemblyReferenceHandle)typeRef.ResolutionScope);
-				var assemblyName = reader.GetString (assembly.Name);
-
-				var typeNS = reader.GetString (typeRef.Namespace);
-				var typeName = reader.GetString (typeRef.Name);
-				using (var stream = File.OpenRead (Path.Combine (Path.GetDirectoryName (assemblyFile), assemblyName + ".dll")))
-				using (var pe = new PEReader (stream)) {
-					var r = pe.GetMetadataReader ();
-					foreach (var e in r.ExportedTypes) {
-						var et = r.GetExportedType (e);
-						if (r.GetString (et.Name) != typeName)
-							continue;
-						if (r.GetString (et.Namespace) != typeNS)
-							continue;
-						throw new System.Exception ();
-					}
-
-					throw new System.Exception ();
-				}
+				var typeReference = reader.GetTypeReference ((TypeReferenceHandle)baseType);
+				var (assemblyReader, typeDefinition) = resolver.ResolveType (reader, typeReference);
+				return new ResolvedTypeDefinition {
+					Type = typeDefinition,
+					Reader = assemblyReader,
+				};
 			} else {
-				throw new System.Exception ();
+				return null;
 			}
+		}
+
+		class ResolvedTypeDefinition
+		{
+			public MetadataReader Reader { get; set; }
+			public System.Reflection.Metadata.TypeDefinition Type { get; set; }
 		}
 	}
 }
