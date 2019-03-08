@@ -22,60 +22,33 @@ namespace Benchmarks
 			assemblies = Directory.GetFiles (assembliesDir, "*.dll");
 		}
 
-		[Benchmark (Description = "Mono.Cecil with default settings.")]
+		[Benchmark (Description = "Mono.Cecil")]
 		public void MonoCecil ()
 		{
 			using (var resolver = new DirectoryAssemblyResolver (Log, loadDebugSymbols: false)) {
-				IterateAssemblies (resolver);
-			}
-		}
-
-		[Benchmark (Description = "Mono.Cecil with InMemory=True setting.")]
-		public void MonoCecil_InMemory ()
-		{
-			var rp = new ReaderParameters {
-				InMemory = true
-			};
-			using (var resolver = new DirectoryAssemblyResolver (Log, loadDebugSymbols: false, loadReaderParameters: rp)) {
-				IterateAssemblies (resolver);
-			}
-		}
-
-		[Benchmark (Description = "Mono.Cecil with ReadingMode.Deferred setting.")]
-		public void MonoCecil_Deferred ()
-		{
-			var rp = new ReaderParameters {
-				ReadingMode = ReadingMode.Deferred,
-			};
-			using (var resolver = new DirectoryAssemblyResolver (Log, loadDebugSymbols: false, loadReaderParameters: rp)) {
-				IterateAssemblies (resolver);
-			}
-		}
-
-		void Log (TraceLevel level, string message) { }
-
-		void IterateAssemblies (DirectoryAssemblyResolver resolver)
-		{
-			foreach (var assemblyFile in assemblies) {
-				var assembly = resolver.Load (assemblyFile);
-				foreach (var mod in assembly.Modules) {
-					foreach (var resource in mod.Resources) {
-						var name = resource.Name;
-					}
-					foreach (var attr in mod.CustomAttributes) {
-						var name = attr.AttributeType.Name;
-					}
-					foreach (var type in mod.Types) {
-						var name = type.Name;
-						foreach (var method in type.Methods) {
-							var mname = method.Name;
+				foreach (var assemblyFile in assemblies) {
+					var assembly = resolver.Load (assemblyFile);
+					foreach (var mod in assembly.Modules) {
+						foreach (var resource in mod.Resources) {
+							var name = resource.Name;
+						}
+						foreach (var attr in mod.CustomAttributes) {
+							var name = attr.AttributeType.Name;
+						}
+						foreach (var type in mod.Types) {
+							var name = type.Name;
+							foreach (var method in type.Methods) {
+								var mname = method.Name;
+							}
 						}
 					}
 				}
 			}
 		}
 
-		[Benchmark (Description = "System.Reflection.Metadata with default settings.")]
+		void Log (TraceLevel level, string message) { }
+
+		[Benchmark (Description = "System.Reflection.Metadata")]
 		public void SystemReflectionMetadata ()
 		{
 			foreach (var assemblyFile in assemblies) {
