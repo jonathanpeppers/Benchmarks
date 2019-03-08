@@ -53,7 +53,7 @@ namespace System.Reflection.Metadata
 			throw new FileNotFoundException ($"Could not load assembly '{assemblyName}'.", assemblyName);
 		}
 
-		public (MetadataReader, TypeDefinition) ResolveType (MetadataReader reader, TypeReference type)
+		public (bool, MetadataReader, TypeDefinition) ResolveType (MetadataReader reader, TypeReference type)
 		{
 			if (type.ResolutionScope.Kind == HandleKind.TypeReference) {
 				return ResolveType (reader, reader.GetTypeReference ((TypeReferenceHandle)type.ResolutionScope));
@@ -73,11 +73,12 @@ namespace System.Reflection.Metadata
 			foreach (var h in assemblyReader.TypeDefinitions) {
 				var typeDefinition = assemblyReader.GetTypeDefinition (h);
 				if (assemblyReader.GetFullName (typeDefinition) == fullName) {
-					return (assemblyReader, typeDefinition);
+					return (true, assemblyReader, typeDefinition);
 				}
 			}
 
-			throw new InvalidOperationException ($"Unable to find type {fullName} in assembly {assemblyName.Name}!");
+			return (false, null, default (TypeDefinition));
+			//throw new InvalidOperationException ($"Unable to find type {fullName} in assembly {assemblyName.Name}!");
 		}
 
 		public void Dispose ()

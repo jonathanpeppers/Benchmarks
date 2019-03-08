@@ -1,12 +1,10 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Java.Interop.Tools.Cecil;
-using Mono.Cecil;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Reflection.Metadata;
-using System.Reflection.PortableExecutable;
 
 namespace Benchmarks
 {
@@ -28,6 +26,8 @@ namespace Benchmarks
 		public void MonoCecil ()
 		{
 			using (var resolver = new DirectoryAssemblyResolver (Log, loadDebugSymbols: false)) {
+				resolver.SearchDirectories.Add (assembliesDir);
+
 				foreach (var assemblyFile in assemblies) {
 					var assembly = resolver.Load (assemblyFile);
 					foreach (var mod in assembly.Modules) {
@@ -45,6 +45,25 @@ namespace Benchmarks
 
 		void Log (TraceLevel level, string message) { }
 
+		[Benchmark (Description = "System.Reflection.MetadataLoadContext")]
+		public void SystemReflectionMetadataLoadContext ()
+		{
+			var resolver = new PathAssemblyResolver (assemblies);
+			using (var context = new MetadataLoadContext (resolver)) {
+				foreach (var assemblyFile in assemblies) {
+					var assembly = context.LoadFromAssemblyPath (assemblyFile);
+					foreach (var type in assembly.GetTypes ()) {
+						var name = type.Name;
+						var baseType = type;
+						while ((baseType = baseType.BaseType) != null) {
+							name = baseType.Name;
+						}
+					}
+				}
+			}
+		}
+
+		//NOTE: this one really slow
 		//[Benchmark (Description = "System.Reflection.Metadata")]
 		public void SystemReflectionMetadata ()
 		{
@@ -56,9 +75,6 @@ namespace Benchmarks
 					foreach (var t in reader.TypeDefinitions) {
 						var type = reader.GetTypeDefinition (t);
 						var name = reader.GetString (type.Name);
-						if (name == "<Module>")
-							continue;
-
 						var resolved = new ResolvedTypeDefinition {
 							Type = type,
 							Reader = reader,
@@ -83,7 +99,9 @@ namespace Benchmarks
 				};
 			} else if (baseType.Kind == HandleKind.TypeReference) {
 				var typeReference = reader.GetTypeReference ((TypeReferenceHandle)baseType);
-				var (assemblyReader, typeDefinition) = resolver.ResolveType (reader, typeReference);
+				var (success, assemblyReader, typeDefinition) = resolver.ResolveType (reader, typeReference);
+				if (!success)
+					return null;
 				return new ResolvedTypeDefinition {
 					Type = typeDefinition,
 					Reader = assemblyReader,

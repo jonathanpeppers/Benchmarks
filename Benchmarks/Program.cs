@@ -7,8 +7,6 @@ namespace Benchmarks
 	{
 		static void Main (string [] args)
 		{
-			new Cecil ().SystemReflectionMetadata ();
-
 			var summary = BenchmarkRunner.Run<Cecil> ();
 		}
 	}
