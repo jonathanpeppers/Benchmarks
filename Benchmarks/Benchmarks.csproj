@@ -34,7 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Mono.Cecil">
-      <Version>0.10.1</Version>
+      <Version>0.10.3</Version>
     </PackageReference>
     <PackageReference Include="System.Reflection.Metadata">
       <Version>1.6.0</Version>
