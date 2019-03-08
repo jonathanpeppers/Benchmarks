@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
+using System.Security.Cryptography;
+using Xamarin.Tools.Zip;
 
 namespace Benchmarks
 {
@@ -34,8 +36,16 @@ namespace Benchmarks
 						foreach (var r in mod.Resources) {
 							if (r is EmbeddedResource resource) {
 								using (var s = resource.GetResourceStream ()) {
-									memory.SetLength (0);
-									s.CopyTo (memory);
+									var hash = HashStream (s);
+									if (resource.Name == "__AndroidLibraryProjects__.zip") {
+										s.Position = 0;
+										using (var zip = ZipArchive.Open (s)) {
+											foreach (var entry in zip) {
+												memory.SetLength (0);
+												entry.Extract (memory);
+											}
+										}
+									}
 								}
 							}
 						}
@@ -57,9 +67,18 @@ namespace Benchmarks
 						var assembly = reader.GetAssemblyDefinition ();
 						foreach (var r in reader.ManifestResources) {
 							var resource = reader.GetManifestResource (r);
+							var name = reader.GetString (resource.Name);
 							using (var s = GetEmbeddedResourceStream (pe, resource)) {
-								memory.SetLength (0);
-								s.CopyTo (memory);
+								var hash = HashStream (s);
+								if (name == "__AndroidLibraryProjects__.zip") {
+									s.Position = 0;
+									using (var zip = ZipArchive.Open (s)) {
+										foreach (var entry in zip) {
+											memory.SetLength (0);
+											entry.Extract (memory);
+										}
+									}
+								}
 							}
 						}
 					}
@@ -106,6 +125,14 @@ namespace Benchmarks
 				}
 
 				return new UnmanagedMemoryStream (resourceStart, resourceLength);
+			}
+		}
+
+		public static string HashStream (Stream stream)
+		{
+			using (HashAlgorithm hashAlg = new SHA1Managed ()) {
+				byte [] hash = hashAlg.ComputeHash (stream);
+				return BitConverter.ToString (hash);
 			}
 		}
 	}
