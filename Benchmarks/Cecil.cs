@@ -1,9 +1,12 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Java.Interop.Tools.Cecil;
-using Mono.Cecil;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 
@@ -81,6 +84,49 @@ namespace Benchmarks
 						}
 					}
 				}
+			}
+		}
+
+		[Benchmark (Description = "System.Reflection.MetadataLoadContext")]
+		public void SystemReflectionMetadataLoadContext ()
+		{
+			var resolver = new SimpleResolver (assemblies);
+			using (var context = new MetadataLoadContext (resolver)) {
+				foreach (var assemblyFile in assemblies) {
+					var assembly = context.LoadFromAssemblyPath (assemblyFile);
+					foreach (var r in assembly.GetManifestResourceNames ()) {
+						var name = r;
+					}
+					foreach (var a in assembly.CustomAttributes) {
+						var name = a.AttributeType.Name;
+					}
+					foreach (var t in assembly.GetTypes ()) {
+						var name = t.Name;
+						foreach (var m in t.GetMethods()) {
+							var mname = m.Name;
+						}
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// NOTE: we can't just use System.Reflection.PathAssemblyResolver, because it compares PublicKeyToken
+		/// </summary>
+		class SimpleResolver : MetadataAssemblyResolver
+		{
+			readonly Dictionary<string, string> assemblyNames = new Dictionary<string, string> (StringComparer.Ordinal);
+
+			public SimpleResolver (string[] assemblies)
+			{
+				foreach (string assemblyPath in assemblies) {
+					assemblyNames.Add (Path.GetFileNameWithoutExtension (assemblyPath), assemblyPath);
+				}
+			}
+
+			public override Assembly Resolve (MetadataLoadContext context, AssemblyName assemblyName)
+			{
+				return context.LoadFromAssemblyPath (assemblyNames [assemblyName.Name]);
 			}
 		}
 	}
