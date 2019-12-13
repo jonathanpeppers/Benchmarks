@@ -7,7 +7,7 @@ namespace Benchmarks
 	{
 		static void Main (string [] args)
 		{
-			var summary = BenchmarkRunner.Run<Cecil> ();
+			var summary = BenchmarkRunner.Run<Clamp> ();
 		}
 	}
 }
