@@ -39,15 +39,27 @@ namespace Benchmarks
 		readonly Random rand = new Random();
 
 		[Benchmark]
-		public void Clamp1 ()
+		public void Clamp1()
 		{
 			rand.NextDouble().Clamp1(rand.NextDouble(), rand.NextDouble());
 		}
 
 		[Benchmark]
-		public void Clamp2 ()
+		public void Clamp2()
 		{
 			rand.NextDouble().Clamp2(rand.NextDouble(), rand.NextDouble());
+		}
+
+		[Benchmark]
+		public void Color1 ()
+		{
+			var color = Xamarin.Forms.Color1.FromRgb(rand.NextDouble(), rand.NextDouble(), rand.NextDouble());
+		}
+
+		[Benchmark]
+		public void Color2()
+		{
+			var color = Xamarin.Forms.Color2.FromRgb(rand.NextDouble(), rand.NextDouble(), rand.NextDouble());
 		}
 	}
 }
