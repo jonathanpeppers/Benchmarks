@@ -33,12 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Mono.Cecil">
-      <Version>0.10.3</Version>
-    </PackageReference>
-    <PackageReference Include="System.Reflection.Metadata">
-      <Version>1.6.0</Version>
-    </PackageReference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -50,16 +44,7 @@
     <PackageReference Include="BenchmarkDotNet" Version="0.11.3" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\external\java.interop\src\Java.Interop.Tools.Cecil\Java.Interop.Tools.Cecil\DirectoryAssemblyResolver.cs">
-      <Link>Java.Interop\DirectoryAssemblyResolver.cs</Link>
-    </Compile>
-    <Compile Include="..\external\java.interop\src\Java.Interop.Tools.Diagnostics\Java.Interop.Tools.Diagnostics\Diagnostic.cs">
-      <Link>Java.Interop\Diagnostic.cs</Link>
-    </Compile>
-    <Compile Include="..\external\java.interop\src\Java.Interop.Tools.Diagnostics\Java.Interop.Tools.Diagnostics\XamarinAndroidException.cs">
-      <Link>Java.Interop\XamarinAndroidException.cs</Link>
-    </Compile>
-    <Compile Include="Cecil.cs" />
+    <Compile Include="AssemblyCustomAttributes.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

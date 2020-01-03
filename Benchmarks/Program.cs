@@ -7,7 +7,8 @@ namespace Benchmarks
 	{
 		static void Main (string [] args)
 		{
-			var summary = BenchmarkRunner.Run<Cecil> ();
+			new AssemblyCustomAttributes();
+			var summary = BenchmarkRunner.Run<AssemblyCustomAttributes> ();
 		}
 	}
 }
