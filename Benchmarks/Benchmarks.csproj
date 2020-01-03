@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Xamarin.Forms">
+      <Version>4.4.0.991265</Version>
+    </PackageReference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -44,11 +47,9 @@
     <PackageReference Include="BenchmarkDotNet" Version="0.11.3" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Clamp.cs" />
-    <Compile Include="Color2.cs" />
-    <Compile Include="Color1.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyChangedExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
