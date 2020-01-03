@@ -6,6 +6,7 @@ using Xamarin.Forms;
 
 namespace Benchmarks
 {
+	[InProcess]
 	[Orderer(SummaryOrderPolicy.FastestToSlowest)]
 	[MemoryDiagnoser]
 	public class PropertyChangedExtensions : BindableObject
