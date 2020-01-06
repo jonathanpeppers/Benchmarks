@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Diagnostics;
 using Xamarin.Forms.Internals;
@@ -84,6 +85,15 @@ namespace Xamarin.Forms
 				_source = value;
 				if ((value as RelativeBindingSource)?.Mode == RelativeBindingSourceMode.TemplatedParent)
 					AllowChaining = true;
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		new void ThrowIfApplied()
+		{
+			if (IsApplied)
+			{
+				throw new InvalidOperationException("Can not change a binding while it's applied");
 			}
 		}
 
@@ -276,11 +286,7 @@ namespace Xamarin.Forms
 
 		internal override BindingBase Clone()
 		{
-			return new Binding(Path, Mode) {
-				Converter = Converter,
-				ConverterParameter = ConverterParameter,
-				StringFormat = StringFormat,
-				Source = Source,
+			return new Binding2(Path, Mode, Converter, ConverterParameter, StringFormat, Source) {
 				UpdateSourceEventName = UpdateSourceEventName,
 				TargetNullValue = TargetNullValue,
 				FallbackValue = FallbackValue,

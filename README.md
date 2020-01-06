@@ -1,74 +1,43 @@
 # Benchmarks
 
-Initial benchmarks for Mono.Cecil vs System.Reflection.Metadata (Windows):
+Benchmarkings for improvements around Xamarin.Forms `Binding`:
 ```
-// * Summary *
-
-BenchmarkDotNet=v0.11.3, OS=Windows 10.0.17763.194 (1809/October2018Update/Redstone5)
-Intel Core i7-7600U CPU 2.80GHz (Kaby Lake), 1 CPU, 4 logical and 2 physical cores
-  [Host]     : .NET Framework 4.7.2 (CLR 4.0.30319.42000), 32bit LegacyJIT-v4.7.3260.0
-  DefaultJob : .NET Framework 4.7.2 (CLR 4.0.30319.42000), 32bit LegacyJIT-v4.7.3260.0
+BenchmarkDotNet=v0.11.3, OS=Windows 10.0.18362
+Intel Core i9-9900K CPU 3.60GHz, 1 CPU, 16 logical and 8 physical cores
+  [Host]     : .NET Framework 4.7.2 (CLR 4.0.30319.42000), 32bit LegacyJIT-v4.8.4075.0
+  DefaultJob : .NET Framework 4.7.2 (CLR 4.0.30319.42000), 32bit LegacyJIT-v4.8.4075.0
 
 
-                                              Method |      Mean |     Error |    StdDev |    Median | Gen 0/1k Op | Gen 1/1k Op | Gen 2/1k Op | Allocated Memory/Op |
----------------------------------------------------- |----------:|----------:|----------:|----------:|------------:|------------:|------------:|--------------------:|
- 'System.Reflection.Metadata with default settings.' |  50.98 ms |  2.187 ms |  3.998 ms |  49.31 ms |   7444.4444 |           - |           - |             15.1 MB |
-                 'Mono.Cecil with default settings.' | 538.70 ms | 10.666 ms |  9.977 ms | 538.74 ms |  16000.0000 |  11000.0000 |   3000.0000 |           103.41 MB |
-     'Mono.Cecil with ReadingMode.Deferred setting.' | 543.68 ms | 10.796 ms | 12.432 ms | 543.74 ms |  16000.0000 |  11000.0000 |   3000.0000 |           103.41 MB |
-            'Mono.Cecil with InMemory=True setting.' | 565.58 ms | 11.257 ms | 14.236 ms | 563.15 ms |  16000.0000 |  11000.0000 |   3000.0000 |           157.73 MB |
-
-// * Hints *
-Outliers
-  Cecil.'System.Reflection.Metadata with default settings.': Default -> 7 outliers were removed
-  Cecil.'Mono.Cecil with default settings.': Default                 -> 1 outlier  was  removed
-
-// * Legends *
-  Mean                : Arithmetic mean of all measurements
-  Error               : Half of 99.9% confidence interval
-  StdDev              : Standard deviation of all measurements
-  Median              : Value separating the higher half of all measurements (50th percentile)
-  Gen 0/1k Op         : GC Generation 0 collects per 1k Operations
-  Gen 1/1k Op         : GC Generation 1 collects per 1k Operations
-  Gen 2/1k Op         : GC Generation 2 collects per 1k Operations
-  Allocated Memory/Op : Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)
-  1 ms                : 1 Millisecond (0.001 sec)
-
-// ***** BenchmarkRunner: End *****
-Run time: 00:01:26 (86.94 sec), executed benchmarks: 4
+         Method |       Mean |      Error |     StdDev | Gen 0/1k Op | Gen 1/1k Op | Gen 2/1k Op | Allocated Memory/Op |
+--------------- |-----------:|-----------:|-----------:|------------:|------------:|------------:|--------------------:|
+    CtorSingle2 |   122.6 ns |  0.5047 ns |  0.4721 ns |      0.0701 |           - |           - |               369 B |
+    CtorSingle1 |   156.3 ns |  0.5229 ns |  0.4636 ns |      0.0801 |           - |           - |               421 B |
+  CtorMultiple2 |   337.7 ns |  2.5286 ns |  2.3652 ns |      0.1631 |           - |           - |               857 B |
+  CtorMultiple1 |   435.4 ns |  1.0472 ns |  0.9796 ns |      0.1936 |           - |           - |              1017 B |
+         Clone2 |   667.0 ns |  2.5739 ns |  2.0095 ns |      0.3262 |      0.0010 |           - |              1715 B |
+         Clone1 |   890.6 ns |  9.1459 ns |  8.5551 ns |      0.3872 |      0.0010 |           - |              2035 B |
+   ApplySingle2 | 1,512.4 ns |  9.0686 ns |  7.0802 ns |      0.0992 |           - |           - |               521 B |
+   ApplySingle1 | 1,655.3 ns | 31.1960 ns | 35.9253 ns |      0.1087 |           - |           - |               573 B |
+ ApplyMultiple2 | 4,501.1 ns | 21.8014 ns | 20.3930 ns |      0.2594 |           - |           - |              1394 B |
+ ApplyMultiple1 | 4,510.7 ns | 25.4709 ns | 22.5793 ns |      0.2899 |           - |           - |              1554 B |
 ```
 
 Results on MacOS:
 ```
-// * Summary *
-
-BenchmarkDotNet=v0.11.3, OS=macOS Mojave 10.14.2 (18C54) [Darwin 18.2.0]
+BenchmarkDotNet=v0.11.3, OS=macOS Mojave 10.14.6 (18G95) [Darwin 18.7.0]
 Intel Core i7-6567U CPU 3.30GHz (Skylake), 1 CPU, 4 logical and 2 physical cores
-  [Host]     : Mono 5.18.0.162 (2018-08/bc9d709e704 Fri), 64bit
-  DefaultJob : Mono 5.18.0.162 (2018-08/bc9d709e704 Fri), 64bit
-
-
-                                              Method |      Mean |      Error |     StdDev | Gen 0/1k Op | Gen 1/1k Op | Gen 2/1k Op | Allocated Memory/Op |
----------------------------------------------------- |----------:|-----------:|-----------:|------------:|------------:|------------:|--------------------:|
- 'System.Reflection.Metadata with default settings.' |  95.54 ms |  0.8713 ms |  0.7724 ms |   4500.0000 |           - |           - |                   - |
-     'Mono.Cecil with ReadingMode.Deferred setting.' | 425.76 ms |  8.2878 ms |  9.8660 ms |  26000.0000 |   5000.0000 |   5000.0000 |                   - |
-                 'Mono.Cecil with default settings.' | 436.69 ms | 16.3162 ms | 16.7555 ms |  28000.0000 |   6000.0000 |   6000.0000 |                   - |
-            'Mono.Cecil with InMemory=True setting.' | 465.90 ms |  4.8805 ms |  4.3265 ms |  26000.0000 |   6000.0000 |   6000.0000 |                   - |
-
-// * Hints *
-Outliers
-  Cecil.'System.Reflection.Metadata with default settings.': Default -> 1 outlier  was  removed
-  Cecil.'Mono.Cecil with ReadingMode.Deferred setting.': Default     -> 2 outliers were removed, 4 outliers were detected
-
-// * Legends *
-  Mean                : Arithmetic mean of all measurements
-  Error               : Half of 99.9% confidence interval
-  StdDev              : Standard deviation of all measurements
-  Gen 0/1k Op         : GC Generation 0 collects per 1k Operations
-  Gen 1/1k Op         : GC Generation 1 collects per 1k Operations
-  Gen 2/1k Op         : GC Generation 2 collects per 1k Operations
-  Allocated Memory/Op : Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)
-  1 ms                : 1 Millisecond (0.001 sec)
-
-// ***** BenchmarkRunner: End *****
-Run time: 00:00:58 (58.73 sec), executed benchmarks: 4
+  [Host]     : Mono 6.6.0.155 (2019-08/296a9afdb24 Thu), 64bit 
+  DefaultJob : Mono 6.6.0.155 (2019-08/296a9afdb24 Thu), 64bit 
+         Method |        Mean |      Error |     StdDev |      Median | Gen 0/1k Op | Gen 1/1k Op | Gen 2/1k Op | Allocated Memory/Op |
+--------------- |------------:|-----------:|-----------:|------------:|------------:|------------:|------------:|--------------------:|
+    CtorSingle2 |    355.9 ns |   2.600 ns |   2.432 ns |    356.1 ns |      0.1950 |           - |           - |                   - |
+    CtorSingle1 |    447.0 ns |  28.825 ns |  29.601 ns |    432.4 ns |      0.2203 |           - |           - |                   - |
+  CtorMultiple2 |  1,316.6 ns |   7.092 ns |   6.287 ns |  1,316.6 ns |      0.4292 |           - |           - |                   - |
+  CtorMultiple1 |  1,611.0 ns |  77.914 ns | 109.225 ns |  1,560.9 ns |      0.4997 |           - |           - |                   - |
+         Clone2 |  2,670.6 ns |  38.075 ns |  33.753 ns |  2,655.7 ns |      0.8583 |           - |           - |                   - |
+         Clone1 |  3,154.3 ns |  15.010 ns |  14.040 ns |  3,151.7 ns |      0.9995 |           - |           - |                   - |
+   ApplySingle2 |  8,065.5 ns |  87.537 ns |  77.599 ns |  8,071.3 ns |      0.3052 |           - |           - |                   - |
+   ApplySingle1 |  8,555.2 ns | 183.373 ns | 508.126 ns |  8,268.9 ns |      0.3357 |           - |           - |                   - |
+ ApplyMultiple2 | 28,933.1 ns | 252.589 ns | 236.272 ns | 28,937.1 ns |      0.8850 |           - |           - |                   - |
+ ApplyMultiple1 | 29,388.9 ns | 269.263 ns | 251.868 ns | 29,296.0 ns |      0.9766 |           - |           - |                   - |
 ```
