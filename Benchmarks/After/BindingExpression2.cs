@@ -110,7 +110,6 @@ namespace Xamarin.Forms
 			for (var i = 0; i < _parts.Count; i++)
 			{
 				part = _parts[i];
-				bool isLast = i + 1 == _parts.Count;
 
 				if (!part.IsSelf && current != null)
 				{
@@ -119,7 +118,7 @@ namespace Xamarin.Forms
 					if (part.LastGetter == null || !part.LastGetter.DeclaringType.GetTypeInfo().IsAssignableFrom(currentType))
 						SetupPart(currentType, part);
 
-					if (!isLast)
+					if (i < _parts.Count - 1)
 						part.TryGetValue(current, out current);
 				}
 
@@ -140,8 +139,7 @@ namespace Xamarin.Forms
 
 			if (needsGetter)
 			{
-				object value = property.DefaultValue;
-				if (part.TryGetValue(current, out value) || part.IsSelf) {
+				if (part.TryGetValue(current, out object value) || part.IsSelf) {
 					value = Binding.GetSourceValue(value, property.ReturnType);
 				}
 				else
@@ -217,6 +215,8 @@ namespace Xamarin.Forms
 				yield return indexer;
 		}
 
+		static readonly char[] ExpressionSplit = new[] { '.' };
+
 		void ParsePath()
 		{
 			string p = Path.Trim();
@@ -232,7 +232,7 @@ namespace Xamarin.Forms
 				p = p.Substring(1);
 			}
 
-			string[] pathParts = p.Split('.');
+			string[] pathParts = p.Split(ExpressionSplit);
 			for (var i = 0; i < pathParts.Length; i++)
 			{
 				foreach (BindingExpressionPart part in GetPart(pathParts[i]))
@@ -655,7 +655,6 @@ namespace Xamarin.Forms
 		class BindingExpressionPart
 		{
 			readonly BindingExpression2 _expression;
-			readonly PropertyChangedEventHandler _changeHandler;
 			WeakPropertyChangedProxy _listener;
 
 			public BindingExpressionPart(BindingExpression2 expression, string content, bool isIndexer = false)
@@ -664,8 +663,6 @@ namespace Xamarin.Forms
 				IsSelf = content == Forms.Binding.SelfPath;
 				Content = content;
 				IsIndexer = isIndexer;
-
-				_changeHandler = PropertyChanged;
 			}
 
 			public void Subscribe(INotifyPropertyChanged handler)
@@ -678,7 +675,7 @@ namespace Xamarin.Forms
 				// Clear out the old subscription if necessary
 				Unsubscribe();
 
-				_listener = new WeakPropertyChangedProxy(handler, _changeHandler);
+				_listener = new WeakPropertyChangedProxy(handler, PropertyChanged);
 			}
 
 			public void Unsubscribe()
