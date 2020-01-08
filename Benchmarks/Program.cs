@@ -7,7 +7,7 @@ namespace Benchmarks
 	{
 		static void Main (string [] args)
 		{
-			var summary = BenchmarkRunner.Run<PropertyChangedExtensions> ();
+			var summary = BenchmarkRunner.Run<FullyQualifiedName> ();
 		}
 	}
 }
