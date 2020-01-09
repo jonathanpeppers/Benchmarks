@@ -18,5 +18,15 @@ Intel Core i9-9900K CPU 3.60GHz, 1 CPU, 16 logical and 8 physical cores
 
 Results on MacOS:
 ```
-TODO
+Intel Core i7-6567U CPU 3.30GHz (Skylake), 1 CPU, 4 logical and 2 physical cores
+  [Host]     : Mono 6.6.0.155 (2019-08/296a9afdb24 Thu), 64bit 
+  DefaultJob : Mono 6.6.0.155 (2019-08/296a9afdb24 Thu), 64bit 
+
+
+          Method |     Mean |     Error |    StdDev | Gen 0/1k Op | Gen 1/1k Op | Gen 2/1k Op | Allocated Memory/Op |
+---------------- |---------:|----------:|----------:|------------:|------------:|------------:|--------------------:|
+      Substring2 | 1.596 us | 0.0040 us | 0.0035 us |      0.0687 |           - |           - |                   - |
+       Substring | 1.657 us | 0.0328 us | 0.0471 us |      0.0687 |           - |           - |                   - |
+      Substring3 | 1.710 us | 0.0071 us | 0.0055 us |      0.0687 |           - |           - |                   - |
+ AssemblyGetName | 2.182 us | 0.0110 us | 0.0097 us |      0.2289 |           - |           - |                   - |
 ```
