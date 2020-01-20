@@ -42,6 +42,12 @@ namespace Benchmarks
 		}
 
 		[Benchmark]
+		public void CopyIfStreamChanged3 ()
+		{
+			Files3.CopyIfStreamChanged (stream, tempFile);
+		}
+
+		[Benchmark]
 		public void NoExist1 ()
 		{
 			Files.CopyIfStreamChanged (stream, Path.Combine (tempDir, Path.GetRandomFileName ()));
@@ -51,6 +57,12 @@ namespace Benchmarks
 		public void NoExist2 ()
 		{
 			Files2.CopyIfStreamChanged (stream, Path.Combine (tempDir, Path.GetRandomFileName ()));
+		}
+
+		[Benchmark]
+		public void NoExist3 ()
+		{
+			Files3.CopyIfStreamChanged (stream, Path.Combine (tempDir, Path.GetRandomFileName ()));
 		}
 
 		[GlobalCleanup]
