@@ -2,7 +2,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using System;
 using System.IO;
-using Xamarin.Android.Tools;
 
 namespace Benchmarks
 {
@@ -10,65 +9,49 @@ namespace Benchmarks
 	[MemoryDiagnoser]
 	public class FilesBenchmarks
 	{
-		readonly Guid seed = Guid.NewGuid ();
-		readonly MemoryStream stream = new MemoryStream ();
 		readonly string tempDir = Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ());
 		readonly string tempFile;
+		readonly string tempFileName;
 
 		public FilesBenchmarks ()
 		{
 			Directory.CreateDirectory (tempDir);
-			tempFile = Path.Combine (tempDir, Path.GetRandomFileName ());
-
-			var bytes = seed.ToByteArray ();
-			stream.Write (bytes, 0, bytes.Length);
-
-			stream.Position = 0;
-			using (var file = File.Create (tempFile)) {
-				stream.CopyTo (file);
-			}
+			tempFileName = Path.GetRandomFileName () + ".dll";
+			tempFile = Path.Combine (tempDir, tempFileName);
+			File.WriteAllText (tempFile, contents: "");
 		}
 
 		[Benchmark]
-		public void CopyIfStreamChanged1 ()
+		public void Sample1 ()
 		{
-			Files.CopyIfStreamChanged (stream, tempFile);
+			DirectoryGetFile1 (tempDir, tempFileName);
+		}
+
+		static string DirectoryGetFile1 (string directory, string file)
+		{
+			if (!Directory.Exists (directory))
+				return "";
+
+			var files = Directory.GetFiles (directory, file);
+			if (files != null && files.Length > 0)
+				return files [0];
+
+			return "";
 		}
 
 		[Benchmark]
-		public void CopyIfStreamChanged2 ()
+		public void Sample2 ()
 		{
-			Files2.CopyIfStreamChanged (stream, tempFile);
+			DirectoryGetFile2 (tempDir, tempFileName);
 		}
 
-		[Benchmark]
-		public void CopyIfStreamChanged3 ()
+		static string DirectoryGetFile2 (string directory, string file)
 		{
-			Files3.CopyIfStreamChanged (stream, tempFile);
-		}
+			var path = Path.Combine (directory, file);
+			if (File.Exists (path))
+				return path;
 
-		[Benchmark]
-		public void NoExist1 ()
-		{
-			Files.CopyIfStreamChanged (stream, Path.Combine (tempDir, Path.GetRandomFileName ()));
-		}
-
-		[Benchmark]
-		public void NoExist2 ()
-		{
-			Files2.CopyIfStreamChanged (stream, Path.Combine (tempDir, Path.GetRandomFileName ()));
-		}
-
-		[Benchmark]
-		public void NoExist3 ()
-		{
-			Files3.CopyIfStreamChanged (stream, Path.Combine (tempDir, Path.GetRandomFileName ()));
-		}
-
-		[GlobalCleanup]
-		public void GlobalCleanup ()
-		{
-			Directory.Delete (tempDir, recursive: true);
+			return "";
 		}
 	}
 }
