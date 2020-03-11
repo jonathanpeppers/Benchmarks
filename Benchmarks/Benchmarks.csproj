@@ -50,13 +50,17 @@
     <PackageReference Include="BenchmarkDotNet" Version="0.12.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FilesBenchmarks.cs" />
+    <Compile Include="XmlBenchmark.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="X2009Primitives.xaml" LogicalName="X2009Primitives.xaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
