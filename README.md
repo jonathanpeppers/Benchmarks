@@ -17,10 +17,11 @@ Intel Core i9-9900K CPU 3.60GHz (Coffee Lake), 1 CPU, 16 logical and 8 physical 
 
 |              Method |     Mean |    Error |   StdDev |  Gen 0 | Gen 1 | Gen 2 | Allocated |
 |-------------------- |---------:|---------:|---------:|-------:|------:|------:|----------:|
-| StackOverflowUnsafe | 42.41 ns | 0.228 ns | 0.213 ns | 0.0297 |     - |     - |     156 B |
-|       StackOverflow | 46.89 ns | 0.152 ns | 0.118 ns | 0.0297 |     - |     - |     156 B |
-|          TizenToHex | 58.35 ns | 0.427 ns | 0.399 ns | 0.0297 |     - |     - |     156 B |
-|       XAToHexString | 59.84 ns | 0.121 ns | 0.101 ns | 0.0297 |     - |     - |     156 B |
+|  GrendelStaticArray | 39.90 ns | 0.188 ns | 0.167 ns | 0.0297 |     - |     - |     156 B |
+| StackOverflowUnsafe | 41.56 ns | 0.413 ns | 0.344 ns | 0.0297 |     - |     - |     156 B |
+|       StackOverflow | 46.32 ns | 0.708 ns | 0.662 ns | 0.0297 |     - |     - |     156 B |
+|          TizenToHex | 56.30 ns | 0.386 ns | 0.361 ns | 0.0297 |     - |     - |     156 B |
+|       XAToHexString | 57.92 ns | 0.868 ns | 0.812 ns | 0.0297 |     - |     - |     156 B |
 ```
 
 Results on MacOS:
