@@ -52,7 +52,8 @@
     <PackageReference Include="BenchmarkDotNet" Version="0.12.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HexString.cs" />
+    <Compile Include="SetWriteableDirectory.cs" />
+    <Compile Include="SetWriteableFile.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
