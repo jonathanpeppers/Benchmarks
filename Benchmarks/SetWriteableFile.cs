@@ -39,14 +39,7 @@ namespace Benchmarks
 
 		static void SetWriteable2 (string source)
 		{
-			FileAttributes fromAttr;
-			try {
-				fromAttr = File.GetAttributes (source);
-			} catch {
-				// Exceptions should be rare, callers are already checking File.Exists()
-				return;
-			}
-
+			var fromAttr = File.GetAttributes (source);
 			var toAttr = fromAttr & ~FileAttributes.ReadOnly;
 			if (fromAttr != toAttr) {
 				File.SetAttributes (source, toAttr);
@@ -77,13 +70,13 @@ namespace Benchmarks
 			SetWriteable2 (readonlyFile);
 		}
 
-		[Benchmark]
+		//[Benchmark]
 		public void NoExist1 ()
 		{
 			SetWriteable1 (noExistFile);
 		}
 
-		[Benchmark]
+		//[Benchmark]
 		public void NoExist2 ()
 		{
 			SetWriteable2 (noExistFile);

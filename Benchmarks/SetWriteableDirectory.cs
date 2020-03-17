@@ -116,13 +116,13 @@ namespace Benchmarks
 			SetDirectoryWriteable2 (readonlyDir);
 		}
 
-		[Benchmark]
+		//[Benchmark]
 		public void NoExist1 ()
 		{
 			SetDirectoryWriteable1 (noExistDir);
 		}
 
-		[Benchmark]
+		//[Benchmark]
 		public void NoExist2 ()
 		{
 			SetDirectoryWriteable2 (noExistDir);
