@@ -60,12 +60,14 @@ namespace Xamarin.Android.Tools
 				Directory.CreateDirectory (directory);
 			MonoAndroidHelper.SetWriteable (destination);
 
-			using (var mappedFile = MemoryMappedFile.CreateFromFile (destination, FileMode.Create, Path.GetFileNameWithoutExtension (destination), stream.Length))
-			using (var mappedStream = mappedFile.CreateViewStream ()) {
-				if (HashStream (stream) != HashStream (mappedStream)) {
+			using (var fileStream = File.Create (destination))
+			using (var mappedFile = MemoryMappedFile.CreateFromFile (
+				fileStream, mapName: null, stream.Length, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, leaveOpen: true))
+			using (var viewStream = mappedFile.CreateViewStream (offset: 0, size: stream.Length, MemoryMappedFileAccess.ReadWrite)) {
+				if (HashStream (stream) != HashStream (viewStream)) {
 					// HashStream read to the end
-					stream.Position = mappedStream.Position = 0;
-					stream.CopyTo (mappedStream);
+					stream.Position = viewStream.Position = 0;
+					stream.CopyTo (viewStream);
 					return true;
 				}
 			}
