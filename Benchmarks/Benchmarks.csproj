@@ -10,6 +10,8 @@
     <None Remove="Assemblies\**" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.6.0" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.6.0" />
     <PackageReference Include="System.Buffers" Version="4.5.1" />
     <PackageReference Include="System.Memory" Version="4.5.4" />
     <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
